@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:open_girlfriend_box/device_id_util.dart';
 import 'package:open_girlfriend_box/storage.dart';
 import 'package:open_girlfriend_box/volcenSign.dart';
 import 'package:volc_engine_rtc/volc_engine_rtc.dart';
@@ -39,6 +40,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+    getConfig();
   }
 
 
@@ -55,24 +57,60 @@ class _MyHomePageState extends State<MyHomePage> {
   RTCViewContext? _thirdRemoteRenderContext;
   String roomId = "";
   String userId = "";
+  String nowUserId = "";
   String rtcToken = "";
-  int nowUserId = 0;
-  // Example usage
   String rtcAppId = '';
   String rtcAppKey = '';
-  String asrAppId = '';
+  String voiceAppId = '';
+  String voiceAccessToken = '';
+  String speaker = '';
   String prompt = "";
+  String accessKeyID = "";
+  String secretAccessKey = "";
+  String botId = "";
+  bool isBot = false;
+  bool isClone = false;
 
 
   final rtcAppIdController = TextEditingController();
   final rtcAppKeyController = TextEditingController();
-  final asrAppIdController = TextEditingController();
+  final voiceAppIdController = TextEditingController();
+  final voiceAccessTokenController = TextEditingController();
+  final speakerController = TextEditingController();
   final promptController = TextEditingController();
+  final accessKeyIDController = TextEditingController();
+  final secretAccessKeyController = TextEditingController();
+  final botIdController = TextEditingController();
+
+  getConfig() async {
+    Map? obj = await Storage().getStorage("config");
+    if(obj == null){
+      return;
+    } else {
+      rtcAppId = obj["rtcAppId"];
+      rtcAppKey = obj["rtcAppKey"];
+      voiceAppId = obj["voiceAppId"];
+      prompt = obj["prompt"];
+      accessKeyID = obj["accessKeyID"];
+      secretAccessKey = obj["secretAccessKey"];
+    }
+  }
+
+  setConfig() async {
+    await Storage().setStorage("config", {
+      "rtcAppId": rtcAppId,
+      "rtcAppKey": rtcAppKey,
+      "voiceAppId": voiceAppId,
+      "prompt": prompt,
+      "accessKeyID": accessKeyID,
+      "secretAccessKey": secretAccessKey,
+    });
+  }
 
   getToken() async {
     _videoHandler = RTCVideoEventHandler();
     _roomHandler = RTCRoomEventHandler();
-    nowUserId = DateTime.now().millisecondsSinceEpoch;
+    nowUserId = await DeviceIdUtil.getDeviceId();;
     if(await Storage().hasKey("rtcTokenData")){
       int nowE = DateTime.now().millisecondsSinceEpoch ~/ 1000;
       var data = await Storage().getStorage("rtcTokenData");
@@ -80,8 +118,8 @@ class _MyHomePageState extends State<MyHomePage> {
       print(nowE);
       print("nowE");
       if(data["expireTime"] - nowE <= 60){
-        String roomId = 'rtc_${nowUserId}_device';
-        String userId = 'rtc_${nowUserId}_device';
+        roomId = 'rtc_${nowUserId}_device';
+        userId = 'rtc_${nowUserId}_device';
 
 
         // int now = 1733035134;
@@ -104,10 +142,8 @@ class _MyHomePageState extends State<MyHomePage> {
           "expireTime": now + 7200
         });
       } else {
-        String roomID = 'rtc_${nowUserId}_device';
-        String userID = 'rtc_${nowUserId}_device';
-        roomId = roomID;
-        userId = userID;
+        roomId = 'rtc_${nowUserId}_device';
+        userId = 'rtc_${nowUserId}_device';
         rtcToken = data["rtcToken"];
       }
     } else {
@@ -144,6 +180,8 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
 
+  List vMList = [];
+  String nowUser = "";
 
   void _initRoomEventHandler() {
     /// 远端主播角色用户加入房间回调。
@@ -173,6 +211,13 @@ class _MyHomePageState extends State<MyHomePage> {
     };
     _roomHandler.onSubtitleMessageReceived = (e){
 
+      nowUser = e[0].uid;
+      if(e[0].definite){
+        vMList.add({
+          "type": nowUser == "RtcBot$nowUserId" ? 1 : 2, "info": e[0].text, "isLoading": false, "isVoice": false, "voicePath": "", "voiceLength": ""
+        });
+        Storage().setStorage("messages_$nowUserId", vMList);
+      }
     };
     _roomHandler.onRoomStateChanged = (r, u, e, f) async {
       print("进房回调$r");
@@ -183,8 +228,8 @@ class _MyHomePageState extends State<MyHomePage> {
         await Storage().removeStorage("rtcTokenData");
         // Example usage
 
-        String roomId = 'rtc_${nowUserId}_device';
-        String userId = 'rtc_${nowUserId}_device';
+        roomId = 'rtc_${nowUserId}_device';
+        userId = 'rtc_${nowUserId}_device';
 
         // int now = 1733035134;
         int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
@@ -223,8 +268,8 @@ class _MyHomePageState extends State<MyHomePage> {
     _roomHandler.onTokenWillExpire = () async {
       // Example usage
 
-      String roomId = 'rtc_${nowUserId}_device';
-      String userId = 'rtc_${nowUserId}_device';
+      roomId = 'rtc_${nowUserId}_device';
+      userId = 'rtc_${nowUserId}_device';
 
       // int now = 1733035134;
       int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
@@ -364,34 +409,34 @@ class _MyHomePageState extends State<MyHomePage> {
           "Provider": "volcano",
           "VolumeGain": 0.3,
           "ProviderParams": {
-            "Mode": "smallmodel",
-            "AppId": asrAppId,
-            "Cluster": "volcengine_streaming_common"
+            "Mode": "bigmodel",
+            "StreamMode": 2,
+            "Credential": {
+              "AppId": voiceAppId,
+              "AccessToken ": voiceAccessToken,
+              "ApiResourceId": "volc.seedasr.sauc.duration"
+            },
+            "VolcanoASRParameters": "{}"
           }
         },
         "TTSConfig": {
           "IgnoreBracketText": [1,2],
           "Provider": "volcano",
           "ProviderParams": {
-            "app": {
-              "appid": asrAppId,
-              "cluster": "volcano_tts"
+            "Credential": {
+              "AppId": voiceAppId,
+              "Token": voiceAccessToken,
+              "ResourceId": "volc.service_type.10029"
             },
-            "audio": {
-              "voice_type": "ICL_zh_female_huoponvhai_tob",
-              "speed_ratio": 1.0,
-            }
+            "VolcanoTTSParameters": "{\"req_params\":{\"speaker\":\"${speaker}\"}}"
           }
         },
         "LLMConfig": {
           "Mode": "ArkV3",
-          // "EndPointId": offlineUser != "hongling" ? userToData[offlineUser]["ep-h"] : userToData[offlineUser]["bt"],
-          // "BotId": "bot-20241206102018-7nnft",
           "SystemMessages": [prompt],
-          "EndPointId": "",
-          "BotId": "",
-          "UserMessages": mData,
-          "Temperature": 0.8
+          // "UserMessages": mData,
+          "Temperature": 0.8,
+          "HistoryLength": 20
         },
         "SubtitleConfig": {
           "DisableRTSSubtitle": false
@@ -407,8 +452,22 @@ class _MyHomePageState extends State<MyHomePage> {
 
 
 
+    if(isBot){
+      data["Config"]["LLMConfig"]["BotId"] = botId;
+    } else {
+      data["Config"]["LLMConfig"]["EndPointId"] = botId;
+    }
 
-
+    if(isClone){
+      data["Config"]["TTSConfig"]["ProviderParams"] = {
+        "Credential": {
+          "AppId": voiceAppId,
+          "Token": voiceAccessToken,
+          "ResourceId": "seed-icl-2.0"
+        },
+        "VolcanoTTSParameters": "{\"req_params\":{\"speaker\":\"$speaker\",\"audio_params\":{\"speech_rate\":100}}}"
+      };
+    }
 
 
 
@@ -416,8 +475,9 @@ class _MyHomePageState extends State<MyHomePage> {
     print(data["Config"]["LLMConfig"]["EndPointId"]);
     print(data["Config"]["LLMConfig"]["BotId"]);
 
-    await sendRequest('StartVoiceChat', '2024-12-01', jsonEncode(data));
+    await sendRequest('StartVoiceChat', '2024-12-01', jsonEncode(data), accessKeyID, secretAccessKey);
     _rtcVideo?.enableAudioPropertiesReport(AudioPropertiesConfig());
+    await setConfig();
 
   }
 
@@ -457,7 +517,7 @@ class _MyHomePageState extends State<MyHomePage> {
       "RoomId": roomId,
       "TaskId": userId,
     };
-    await sendRequest('StopVoiceChat', '2024-12-01', jsonEncode(data));
+    await sendRequest('StopVoiceChat', '2024-12-01', jsonEncode(data), accessKeyID, secretAccessKey);
   }
 
   @override
@@ -500,23 +560,67 @@ class _MyHomePageState extends State<MyHomePage> {
                 },
               ),
               TextField(
-                controller: asrAppIdController,
+                controller: voiceAppIdController,
                 decoration: InputDecoration(
-                  labelText: "asrAppId",
-                  hintText: "asrAppId",
+                  labelText: "voiceAppId",
+                  hintText: "voiceAppId",
                 ),
                 onChanged: (e){
-                  asrAppId = e;
+                  voiceAppId = e;
                   setState(() {
 
                   });
                 },
               ),
               TextField(
+                controller: voiceAccessTokenController,
+                decoration: InputDecoration(
+                  labelText: "voiceAccessToken",
+                  hintText: "voiceAccessToken",
+                ),
+                onChanged: (e){
+                  voiceAccessToken = e;
+                  setState(() {
+
+                  });
+                },
+              ),
+              TextField(
+                controller: speakerController,
+                decoration: InputDecoration(
+                  labelText: "speaker",
+                  hintText: "speaker",
+                ),
+                onChanged: (e){
+                  speaker = e;
+                  setState(() {
+
+                  });
+                },
+              ),
+              Row(
+                children: [
+                  Checkbox(
+                    value: isClone,
+                    onChanged: (value) {
+                      isClone = value ?? false;
+                      setState(() {
+
+                      });
+                    },
+                    activeColor: const Color.fromRGBO(117, 98, 249, 1),
+                    side: const BorderSide(color: Colors.grey),
+                    shape: const CircleBorder(),
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  Text("此声音来源于声音复刻")
+                ],
+              ),
+              TextField(
                 controller: promptController,
                 decoration: InputDecoration(
-                  labelText: "asrAppId",
-                  hintText: "asrAppId",
+                  labelText: "prompt",
+                  hintText: "prompt",
                 ),
                 onChanged: (e){
                   prompt = e;
@@ -525,6 +629,63 @@ class _MyHomePageState extends State<MyHomePage> {
                   });
                 },
               ),
+              TextField(
+                controller: accessKeyIDController,
+                decoration: InputDecoration(
+                  labelText: "accessKeyID",
+                  hintText: "accessKeyID",
+                ),
+                onChanged: (e){
+                  accessKeyID = e;
+                  setState(() {
+
+                  });
+                },
+              ),
+              TextField(
+                controller: secretAccessKeyController,
+                decoration: InputDecoration(
+                  labelText: "secretAccessKey",
+                  hintText: "secretAccessKey",
+                ),
+                onChanged: (e){
+                  secretAccessKey = e;
+                  setState(() {
+
+                  });
+                },
+              ),
+              TextField(
+                controller: botIdController,
+                decoration: InputDecoration(
+                  labelText: "botId/epId",
+                  hintText: "botId/epId",
+                ),
+                onChanged: (e){
+                  botId = e;
+                  setState(() {
+
+                  });
+                },
+              ),
+              Row(
+                children: [
+                  Checkbox(
+                    value: isBot,
+                    onChanged: (value) {
+                      isBot = value ?? false;
+                      setState(() {
+
+                      });
+                    },
+                    activeColor: const Color.fromRGBO(117, 98, 249, 1),
+                    side: const BorderSide(color: Colors.grey),
+                    shape: const CircleBorder(),
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  Text("填写的是智能体id而非推理点id")
+                ],
+              )
             ],
           ),
         ),

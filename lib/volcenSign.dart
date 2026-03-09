@@ -7,8 +7,6 @@ import 'package:intl/intl.dart';
 import 'package:pointycastle/export.dart';
 
 // 配置常量
-const String accessKeyID = '';
-const String secretAccessKey = '';
 const String region = 'cn-beijing';
 const String service = 'rtc';
 const String host = 'rtc.volcengineapi.com';
@@ -60,11 +58,11 @@ String buildStringToSign(String date, String canonicalRequest, String credential
 }
 
 // 构建 Authorization Header
-String buildAuthorizationHeader(String credentialScope, String signedHeaders, String signature) {
+String buildAuthorizationHeader(String credentialScope, String signedHeaders, String signature, String accessKeyID) {
   return 'HMAC-SHA256 Credential=$accessKeyID/$credentialScope, SignedHeaders=$signedHeaders, Signature=$signature';
 }
 
-Future<void> sendRequest(String action, String version, String body) async {
+Future<void> sendRequest(String action, String version, String body, String accessKeyID, String secretAccessKey) async {
   final now = DateTime.now().toUtc();
   final date = DateFormat("yyyyMMdd'T'HHmmss'Z'").format(now);
   final authDate = date.substring(0, 8); // 取前8位作为 authDate
@@ -85,7 +83,7 @@ Future<void> sendRequest(String action, String version, String body) async {
   final signingKey = getSigningKey(secretAccessKey, authDate, region, service);
   final signature = hex.encode(hmacSHA256(Uint8List.fromList(signingKey), stringToSign));
 
-  final authorizationHeader = buildAuthorizationHeader(credentialScope, 'host;x-content-sha256;x-date', signature);
+  final authorizationHeader = buildAuthorizationHeader(credentialScope, 'host;x-content-sha256;x-date', signature, accessKeyID);
 
   // 发送 HTTP 请求
   Dio dio = Dio();

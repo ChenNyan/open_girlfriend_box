@@ -1,16 +1,228 @@
-# open_girlfriend_box
+# 简易 AI 女友语音聊天
 
-A new Flutter project.
+一个基于 **Flutter** 与 **火山引擎 AI 能力** 实现的简单 AI 语音聊天应用示例。
 
-## Getting Started
+本项目旨在帮助开发者 **快速创建并体验属于自己的 AI 女友语音聊天功能**，可以随时随地通过手机与智能体进行语音交流。
 
-This project is a starting point for a Flutter application.
+---
 
-A few resources to get you started if this is your first Flutter project:
+# 项目环境
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+本项目开发环境：
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- Flutter **3.35.2**
+- JDK **11**
+
+AI能力来源：
+
+- 火山引擎大模型与智能体服务
+
+---
+
+# 项目简介
+
+本项目通过调用 **火山引擎智能体能力**，在移动端实现一个简单的 AI 语音聊天示例。
+
+使用者可以：
+
+1. 在火山引擎创建自己的智能体
+2. 填写对应 API 参数
+3. 即可在手机上与 AI 进行语音聊天
+
+本项目的目标是：
+
+- 提供一个 **简单可运行的示例**
+- 帮助开发者 **快速接入火山引擎 AI 能力**
+- 方便进行 **二次开发与功能扩展**
+
+---
+
+# ⚠️ 注意事项
+
+## 1. 大模型费用
+
+本项目 **不提供任何大模型服务**。
+
+所有 AI 服务均由 **火山引擎官方提供**，因此：
+
+- 产生的所有费用均由 **火山引擎收取**
+- 请在使用前了解相关计费规则
+
+通常情况下：
+
+- 火山引擎为 **新用户提供一定免费额度**
+
+但仍建议注意以下情况：
+
+- Token 使用量
+- 语音识别费用
+- 实时音视频费用
+- TTS 语音合成费用
+- ASR 语音识别费用
+
+详细信息请参考火山引擎官方文档。
+
+---
+
+## 2. 安全提示
+
+为了方便开发和演示：
+
+**本项目将部分原本应放在服务端的请求直接放在客户端调用。**
+
+因此存在以下风险：
+
+- API Key 泄露
+- Token 被滥用
+- 调用额度被盗用
+
+建议：
+
+- 在正式项目中 **将密钥相关逻辑放在服务端**
+- 避免在客户端直接暴露密钥
+
+使用本项目时，请务必注意：
+
+- 网络环境安全
+- API Key 保密
+- 账号权限控制
+
+避免因此造成经济损失。
+
+---
+
+# 使用方法
+
+## 1. 注册火山引擎账号
+
+访问官网并完成实名认证：
+
+https://www.volcengine.com
+
+---
+
+## 2. 获取 API 参数
+
+请参考以下官方文档获取必要参数，并熟悉相关流程：
+
+- https://www.volcengine.com/docs/6291/65568?lang=zh
+- https://www.volcengine.com/docs/6348/1315561?lang=zh
+
+需要准备的内容通常包括：
+
+- AccessKey
+- SecretKey
+- RtcAppId
+- RtcAppId
+- RtcAppKey
+- VoiceAppId
+- 智能体ID/推理点ID
+- 相关服务配置
+
+---
+
+## 3. 运行项目
+
+你可以通过以下方式运行：
+
+### 方式一：下载 APK
+
+直接安装已编译好的 APK。
+
+### 方式二：自行编译
+
+```bash
+git clone <repo-url>
+
+cd project
+
+flutter pub get
+
+flutter run
+```
+
+---
+
+## 4. 填写密钥参数
+
+在应用对应界面填写：
+
+- API Key
+
+- Secret
+
+- 智能体ID
+
+- 其他相关参数
+
+填写完成后点击：
+
+### 开始聊天
+
+如果配置正确，你将会听到 **智能体向你打招呼**。
+
+---
+
+## 二次开发
+
+欢迎对本项目进行：
+
+- Fork
+
+- 修改
+
+- 二次开发
+
+你可以在此基础上扩展：
+
+- UI优化
+
+- 多角色AI
+
+- 情感陪伴
+
+- 长期记忆
+
+- 语音唤醒
+
+- 硬件结合（如AI陪伴设备）
+
+本项目目前仍在持续完善中，后续将逐步增加更多功能与示例。
+
+---
+
+## 项目状态
+
+🚧 项目仍在持续开发中
+
+目前仓库仍在不断完善，未来可能会增加：
+
+- 更完整的示例代码
+
+- 更完善的配置说明
+
+- UI优化
+
+- 更多 AI 能力接入
+
+欢迎关注仓库更新。
+
+---
+
+## 支持项目
+
+如果你喜欢本项目，欢迎：
+
+⭐ **Star 本仓库**
+👀 **Watch 本仓库**
+👤 **Follow 作者**
+
+你的支持将是对我最大的鼓励，非常感谢！
+
+---
+
+## License
+
+本项目仅用于 **学习与研究用途**。
+
+请在遵守相关服务条款和法律法规的前提下使用。
