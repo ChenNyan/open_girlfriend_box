@@ -485,7 +485,7 @@ class _MyHomePageState extends State<MyHomePage> {
     print(data["Config"]["LLMConfig"]["EndPointId"]);
     print(data["Config"]["LLMConfig"]["BotId"]);
 
-    await sendRequest('StartVoiceChat', '2024-12-01', jsonEncode(data), accessKeyID, secretAccessKey);
+    await sendRequest('StartVoiceChat', '2025-06-01', jsonEncode(data), accessKeyID, secretAccessKey);
     _rtcVideo?.enableAudioPropertiesReport(AudioPropertiesConfig());
     await setConfig();
 
@@ -527,7 +527,7 @@ class _MyHomePageState extends State<MyHomePage> {
       "RoomId": roomId,
       "TaskId": userId,
     };
-    await sendRequest('StopVoiceChat', '2024-12-01', jsonEncode(data), accessKeyID, secretAccessKey);
+    await sendRequest('StopVoiceChat', '2025-06-01', jsonEncode(data), accessKeyID, secretAccessKey);
   }
 
   @override
