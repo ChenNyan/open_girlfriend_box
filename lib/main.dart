@@ -90,9 +90,14 @@ class _MyHomePageState extends State<MyHomePage> {
       rtcAppId = obj["rtcAppId"];
       rtcAppKey = obj["rtcAppKey"];
       voiceAppId = obj["voiceAppId"];
+      voiceAccessToken = obj["voiceAccessToken"];
+      speaker = obj["speaker"];
       prompt = obj["prompt"];
       accessKeyID = obj["accessKeyID"];
       secretAccessKey = obj["secretAccessKey"];
+      botId = obj["botId"];
+      isBot = obj["isBot"];
+      isClone = obj["isClone"];
     }
   }
 
@@ -101,9 +106,14 @@ class _MyHomePageState extends State<MyHomePage> {
       "rtcAppId": rtcAppId,
       "rtcAppKey": rtcAppKey,
       "voiceAppId": voiceAppId,
+      "voiceAccessToken": voiceAccessToken,
+      "speaker": speaker,
       "prompt": prompt,
       "accessKeyID": accessKeyID,
       "secretAccessKey": secretAccessKey,
+      "botId": botId,
+      "isBot": isBot,
+      "isClone": isClone,
     });
   }
 
